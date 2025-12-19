@@ -73,6 +73,24 @@
             max-height: 400px;
             opacity: 1;
         }
+
+        /* Specific styles for Dataset Table to match theme */
+        .ds-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 2px 8px; border-radius: 999px; font-size: 11px;
+            border: 1px solid; white-space: nowrap; font-weight: 500;
+        }
+        .ds-tag.ok { color: #15803d; border-color: #bbf7d0; background: #f0fdf4; }
+        .ds-tag.warn { color: #ca8a04; border-color: #fde68a; background: #fefce8; }
+        .ds-tag.err { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+        .ds-tag.info { color: #0369a1; border-color: #bae6fd; background: #f0f9ff; }
+        
+        .mono-code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px; color: #4b5563; background: #f3f4f6;
+            padding: 8px; border-radius: 6px; border: 1px solid #e5e7eb;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body class="min-h-screen text-gray-800 font-sans">
@@ -161,14 +179,15 @@
         <!-- Main Content Area -->
         <main class="min-h-[500px]">
 
-            <!-- Section 1: AI Analysis Report -->
+            <!-- Section 1: AI Analysis Report & Dataset -->
             <section id="section-report" class="animate-fade-in">
                 <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <!-- Part 1: Feature Selection -->
                     <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
                         <i class="fa-solid fa-microchip mr-2"></i>รายงานผลการวิเคราะห์โมเดล
                     </h2>
                     
-                    <div class="grid md:grid-cols-2 gap-8">
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
                         <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm">
                             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <i class="fa-solid fa-database text-blue-500"></i> ตัวแปรเริ่มต้น (9 ตัวแปร)
@@ -220,6 +239,196 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Part 2: Dataset Sources (Expanded) -->
+                    <div class="border-t pt-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                            <div>
+                                <h3 class="text-xl md:text-2xl font-display font-bold text-gray-800">
+                                    <i class="fa-solid fa-server text-primary mr-2"></i>ตารางสรุป Dataset (API-only)
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    ใช้สำหรับดึงข้อมูลสิ่งแวดล้อมเพื่อคำนวณคะแนนความเหมาะสม (Rule Engine) และฝึกโมเดลคณิตศาสตร์
+                                    โดยเลือกเฉพาะ API ที่เข้าถึงได้ทันทีแบบไม่ต้อง Token/Key
+                                </p>
+                            </div>
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <div class="relative flex-1 md:w-64">
+                                    <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
+                                    <input id="ds-search" type="text" placeholder="ค้นหา: NASA, Sensor, FAO..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
+                                </div>
+                                <button id="btn-copy-csv" class="whitespace-nowrap bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm">
+                                    <i class="fa-solid fa-copy mr-1"></i> Copy CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+                            <table id="dsTable" class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 text-gray-700 text-sm">
+                                    <tr>
+                                        <th class="p-4 font-bold border-b w-[20%]">ชื่อ Dataset / บริการ</th>
+                                        <th class="p-4 font-bold border-b w-[25%]">เหตุผลที่เหมาะกับโครงงาน</th>
+                                        <th class="p-4 font-bold border-b w-[15%]">เจ้าของ / หน่วยงาน</th>
+                                        <th class="p-4 font-bold border-b w-[10%]">การเข้าถึง</th>
+                                        <th class="p-4 font-bold border-b w-[30%]">API ตัวอย่าง / หมายเหตุ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-gray-600 divide-y divide-gray-100">
+                                    
+                                    <!-- Row 1: NASA -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">NASA POWER</div>
+                                            <div class="text-xs text-gray-500 mt-1">อุณหภูมิ, ความชื้น, แสง, ฝน</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            เป็น time-series ระยะยาว เชื่อถือได้ ใช้แทนเซนเซอร์อากาศได้ดี
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">NASA</div>
+                                            <div class="text-xs text-gray-400">(Langley Research Center)</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag ok"><i class="fa-solid fa-check mr-1"></i> No Key</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="mono-code">https://power.larc.nasa.gov/api...</div>
+                                            <div class="text-xs text-gray-500 mt-1">REST API (JSON/CSV)</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 2: Open-Meteo -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">Open-Meteo (ERA5)</div>
+                                            <div class="text-xs text-gray-500 mt-1">ฝน, Soil Moisture, Evapotranspiration</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            ใช้แทนความชื้นดินเชิงแนวโน้ม อธิบายเหตุผล “แห้ง/แฉะ” ได้
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">Open-Meteo</div>
+                                            <div class="text-xs text-gray-400">+ ECMWF</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag ok"><i class="fa-solid fa-check mr-1"></i> No Key</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="mono-code">https://api.open-meteo.com...</div>
+                                            <div class="text-xs text-gray-500 mt-1">REST API (JSON)</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 3: Open-Elevation -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">Open-Elevation API</div>
+                                            <div class="text-xs text-gray-500 mt-1">ความสูงจากระดับน้ำทะเล</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            ความสูงเป็นปัจจัยสำคัญต่อพืชหลายชนิด (กาแฟ, ข้าว, ยาง)
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">Open-Topo</div>
+                                            <div class="text-xs text-gray-400">/ USGS</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag ok"><i class="fa-solid fa-check mr-1"></i> REST API</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="mono-code">https://api.open-elevation.com/api/v1/lookup?locations=LAT,LON</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 4: FAO EcoCrop -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">FAO EcoCrop</div>
+                                            <div class="text-xs text-gray-500 mt-1">เกณฑ์ความเหมาะสมพืช (pH, Temp, Water)</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            เป็นมาตรฐานสากล ใช้เป็น rule-based label ได้
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">FAO</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag warn"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Static Table</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="text-sm text-gray-500">⚠️ ไม่มี REST API ทางการ (ใช้ CSV/JSON ในโปรเจค)</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 5: FAO AEZ -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">FAO AEZ</div>
+                                            <div class="text-xs text-gray-500 mt-1">ความเหมาะสมพืชเชิงนิเวศ</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            ใช้อ้างอิงเชิงวิชาการ อธิบายเชิงภูมิอากาศ
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">FAO</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag warn"><i class="fa-solid fa-book mr-1"></i> Reference</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="text-sm text-gray-500">⚠️ ไม่ใช่ REST API (ใช้เป็น Reference Rule)</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 6: WorldClim -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">WorldClim v2.1</div>
+                                            <div class="text-xs text-gray-500 mt-1">ค่า climate เฉลี่ย (temp, rainfall)</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            ใช้เป็น baseline climate ระยะยาว
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">Univ. of California</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag err"><i class="fa-solid fa-xmark mr-1"></i> Raster</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="text-sm text-gray-500">❌ ไม่จำเป็นถ้ามี POWER (ต้องดาวน์โหลดไฟล์ใหญ่)</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Row 7: Sensor -->
+                                    <tr class="hover:bg-green-50/50 transition-colors">
+                                        <td class="p-4 align-top">
+                                            <div class="font-bold text-gray-800">Sensor (สิ่งประดิษฐ์)</div>
+                                            <div class="text-xs text-gray-500 mt-1">pH, N, P, K, Soil Temp</div>
+                                        </td>
+                                        <td class="p-4 align-top leading-relaxed">
+                                            เป็นข้อมูลจริงของโครงงาน เพิ่มความน่าเชื่อถือ
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="font-semibold text-gray-800">ผู้ทำโครงงาน</div>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <span class="ds-tag info"><i class="fa-solid fa-bolt mr-1"></i> Real-time</span>
+                                        </td>
+                                        <td class="p-4 align-top">
+                                            <div class="text-sm text-gray-500">✅ CSV / Serial Data</div>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">
+                            <i class="fa-solid fa-circle-info mr-1"></i> <b>หมายเหตุ:</b> ตารางนี้สรุปเฉพาะ “Dataset แบบ API ที่ไม่ต้องขอสิทธิ์” และเป็นชุดที่ใช้จริงใน pipeline ของโปรเจคนี้ (NASA POWER + Open-Meteo) เพื่อให้รันบน Colab/เว็บได้ซ้ำได้ทุกครั้ง (reproducible).
+                        </p>
+                    </div>
+
                 </div>
             </section>
 
@@ -496,6 +705,53 @@
             const activeMobileBtn = document.getElementById(`btn-mobile-${sectionId}`);
             if (activeBtn) activeBtn.classList.add('active');
             if (activeMobileBtn) activeMobileBtn.classList.add('active');
+        }
+
+        // ==========================================
+        // DATASET SEARCH & COPY
+        // ==========================================
+        
+        // Search Filter
+        const dsSearch = document.getElementById('ds-search');
+        if(dsSearch) {
+            dsSearch.addEventListener('input', () => {
+                const term = dsSearch.value.trim().toLowerCase();
+                const rows = document.querySelectorAll('#dsTable tbody tr');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            });
+        }
+
+        // Copy CSV
+        function escapeCsv(val){
+            const v = (val ?? '').toString().replace(/\s+/g,' ').trim();
+            if (/[",\n]/.test(v)) return `"${v.replace(/"/g,'""')}"`;
+            return v;
+        }
+
+        const btnCopyCsv = document.getElementById('btn-copy-csv');
+        if(btnCopyCsv) {
+            btnCopyCsv.addEventListener('click', async () => {
+                const rows = document.querySelectorAll('#dsTable tbody tr');
+                const headers = ["ชื่อ Dataset / บริการ", "เหตุผลที่เหมาะกับโครงงาน", "เจ้าของ / หน่วยงาน", "การเข้าถึง", "API ตัวอย่าง"];
+                const csv = [headers.map(escapeCsv).join(",")];
+
+                rows.forEach(r => {
+                    if (r.style.display === 'none') return;
+                    // Note: This matches the columns visually
+                    const cells = Array.from(r.querySelectorAll('td')).map(td => td.innerText);
+                    csv.push(cells.map(escapeCsv).join(","));
+                });
+
+                try{
+                    await navigator.clipboard.writeText(csv.join("\n"));
+                    alert("คัดลอก CSV แล้ว ✅");
+                }catch(e){
+                    alert("คัดลอกไม่สำเร็จ ❌");
+                }
+            });
         }
 
         // ==========================================
