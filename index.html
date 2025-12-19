@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Soil Mate - ระบบตรวจวัดสภาพดินอัจฉริยะ</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax for LaTeX -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                        display: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#15803d', // green-700
+                        secondary: '#f0fdf4', // green-50
+                        accent: '#d4af37', // Gold-ish for luxury
+                        glass: 'rgba(255, 255, 255, 0.95)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2938&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        .nav-btn.active {
+            background-color: #15803d;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Mobile Menu Transition */
+        #mobile-menu {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.open {
+            max-height: 400px;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 font-sans">
+
+    <!-- Overlay to ensure readability -->
+    <div class="fixed inset-0 bg-green-900/10 pointer-events-none"></div>
+
+    <div class="relative container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Header Section -->
+        <header class="glass-panel rounded-3xl p-6 md:p-8 mb-6 text-center animate-fade-in border-t-4 border-primary">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-left w-full md:w-auto">
+                    <h2 class="text-primary font-bold text-base md:text-lg mb-1 flex items-center justify-center md:justify-start">
+                        <i class="fa-solid fa-school mr-2"></i>โรงเรียนห้องสอนศึกษา ในพระอุปถัมภ์ฯ
+                    </h2>
+                    <h1 class="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-2 text-center md:text-left">My Soil Mate</h1>
+                    <h3 class="text-lg md:text-xl text-gray-600 font-display text-center md:text-left">ระบบตรวจวัดสภาพดินอัจฉริยะ (AI-Powered Soil Analysis)</h3>
+                </div>
+                
+                <div class="text-left md:text-right text-sm space-y-2 bg-green-50/80 p-4 rounded-xl border border-green-100 w-full md:w-auto">
+                    <div class="flex flex-col md:flex-row gap-4 md:gap-8 justify-center md:justify-end">
+                        <div>
+                            <p class="font-bold text-primary mb-1">ผู้พัฒนา:</p>
+                            <ul class="text-gray-700 space-y-0.5 text-xs md:text-sm">
+                                <li>1. น.ส.นิชาภัทร วัฒนวราห์</li>
+                                <li>2. น.ส.พลอยชมพู สุมนวัฒนกุล</li>
+                                <li>3. น.ส.สุกฤตา ดิเรกคุณากรณ์</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-bold text-primary mb-1">ครูที่ปรึกษา:</p>
+                            <ul class="text-gray-700 space-y-0.5 text-xs md:text-sm">
+                                <li>1. นายสาธิต ศิริวัชน์</li>
+                                <li>2. นายธนพล ชาวสวน</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Bar -->
+        <div class="glass-panel rounded-2xl p-2 mb-8 sticky top-4 z-50">
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex flex-wrap justify-center gap-4">
+                <button onclick="showSection('report')" id="btn-report" class="nav-btn active px-6 py-3 rounded-xl font-display font-medium transition-all duration-300 hover:bg-green-100 hover:text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> รายงานผลวิเคราะห์
+                </button>
+                <button onclick="showSection('model')" id="btn-model" class="nav-btn px-6 py-3 rounded-xl font-display font-medium transition-all duration-300 hover:bg-green-100 hover:text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-square-root-variable"></i> โมเดลคณิตศาสตร์
+                </button>
+                <button onclick="showSection('predict')" id="btn-predict" class="nav-btn px-6 py-3 rounded-xl font-display font-medium transition-all duration-300 hover:bg-green-100 hover:text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-calculator"></i> คำนวณความเหมาะสม
+                </button>
+                <button onclick="showSection('sheet')" id="btn-sheet" class="nav-btn px-6 py-3 rounded-xl font-display font-medium transition-all duration-300 hover:bg-green-100 hover:text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-table"></i> Google Sheet
+                </button>
+            </div>
+
+            <!-- Mobile Nav Header (Hamburger) -->
+            <div class="md:hidden flex justify-between items-center px-4 py-2">
+                <span class="font-display font-bold text-primary">เมนูหลัก</span>
+                <button onclick="toggleMobileMenu()" class="text-primary hover:bg-green-100 p-2 rounded-lg transition-colors">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Nav Dropdown -->
+            <div id="mobile-menu" class="md:hidden flex flex-col gap-2 px-2 pb-2">
+                <button onclick="showSection('report'); toggleMobileMenu()" id="btn-mobile-report" class="nav-btn active w-full text-left px-4 py-3 rounded-xl font-display font-medium">
+                    <i class="fa-solid fa-chart-pie mr-2"></i> รายงานผลวิเคราะห์
+                </button>
+                <button onclick="showSection('model'); toggleMobileMenu()" id="btn-mobile-model" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-display font-medium">
+                    <i class="fa-solid fa-square-root-variable mr-2"></i> โมเดลคณิตศาสตร์
+                </button>
+                <button onclick="showSection('predict'); toggleMobileMenu()" id="btn-mobile-predict" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-display font-medium">
+                    <i class="fa-solid fa-calculator mr-2"></i> คำนวณความเหมาะสม
+                </button>
+                <button onclick="showSection('sheet'); toggleMobileMenu()" id="btn-mobile-sheet" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-display font-medium">
+                    <i class="fa-solid fa-table mr-2"></i> Google Sheet
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="min-h-[500px]">
+
+            <!-- Section 1: AI Analysis Report -->
+            <section id="section-report" class="animate-fade-in">
+                <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
+                        <i class="fa-solid fa-microchip mr-2"></i>รายงานผลการวิเคราะห์โมเดล
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-database text-blue-500"></i> ตัวแปรเริ่มต้น (9 ตัวแปร)
+                            </h3>
+                            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-droplet text-blue-400 w-5"></i> ความชื้นในดิน</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-wind text-gray-400 w-5"></i> ความชื้นในอากาศ</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-temperature-arrow-down text-orange-400 w-5"></i> อุณหภูมิดิน</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-temperature-high text-red-400 w-5"></i> อุณหภูมิอากาศ</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-sun text-yellow-500 w-5"></i> ค่าความสว่าง</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-flask text-purple-500 w-5"></i> ค่า pH</li>
+                                <li class="flex items-center gap-2"><span class="font-bold text-green-600 w-5">N</span> ไนโตรเจน</li>
+                                <li class="flex items-center gap-2"><span class="font-bold text-green-600 w-5">P</span> ฟอสฟอรัส</li>
+                                <li class="flex items-center gap-2"><span class="font-bold text-green-600 w-5">K</span> โพแทสเซียม</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl border border-green-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-filter text-primary"></i> ผลลัพธ์การคัดเลือกตัวแปร
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="bg-white p-4 rounded-xl border-l-4 border-primary shadow-sm">
+                                    <h4 class="font-bold text-gray-800 mb-2">ลดรูปเหลือ 4 ตัวแปร</h4>
+                                    <p class="text-sm text-gray-600 leading-relaxed">
+                                        ตัดตัวแปรที่มีความสัมพันธ์กันเองสูง (Multicollinearity) เพื่อลดความซับซ้อนของโมเดล (Overfitting) และเพิ่มประสิทธิภาพในการทำนาย
+                                    </p>
+                                </div>
+                                <div>
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        <div class="bg-white p-3 rounded-lg text-center shadow-sm border">
+                                            <div class="font-bold text-purple-600">pH</div>
+                                            <div class="text-xs text-gray-500">กรด-ด่าง</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center shadow-sm border">
+                                            <div class="font-bold text-red-500">Temp</div>
+                                            <div class="text-xs text-gray-500">อุณหภูมิ</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center shadow-sm border">
+                                            <div class="font-bold text-blue-500">Rain</div>
+                                            <div class="text-xs text-gray-500">ปริมาณฝน</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center shadow-sm border">
+                                            <div class="font-bold text-yellow-500">Solar</div>
+                                            <div class="text-xs text-gray-500">แสงแดด</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Mathematical Model -->
+            <section id="section-model" class="hidden animate-fade-in">
+                <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
+                        <i class="fa-solid fa-calculator mr-2"></i>สมการโมเดลคณิตศาสตร์
+                    </h2>
+                    
+                    <div class="flex flex-col items-center justify-center space-y-8 py-4">
+                        <div class="bg-gray-900 text-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-4xl overflow-x-auto">
+                            <p class="text-gray-400 text-sm mb-4 font-mono text-center">/// MULTIPLE LINEAR REGRESSION ///</p>
+                            <div class="text-lg md:text-2xl font-serif text-center leading-relaxed whitespace-nowrap md:whitespace-normal">
+                                $$ Score = \beta_0 + (\beta_1 \times pH) + (\beta_2 \times Temp) + (\beta_3 \times Rain) + (\beta_4 \times Solar) $$
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-4xl">
+                            <div class="bg-white/80 p-6 rounded-xl border border-green-100 shadow-sm">
+                                <h3 class="font-bold text-primary text-lg mb-4">ค่าสัมประสิทธิ์ (Coefficients)</h3>
+                                <ul class="space-y-3 text-gray-700 font-mono text-sm md:text-base">
+                                    <li class="flex justify-between border-b pb-2">
+                                        <span>Intercept (\(\beta_0\))</span>
+                                        <span class="font-bold text-red-500">-53.527421</span>
+                                    </li>
+                                    <li class="flex justify-between border-b pb-2">
+                                        <span>pH Weight (\(\beta_1\))</span>
+                                        <span class="font-bold text-blue-600">+3.021859</span>
+                                    </li>
+                                    <li class="flex justify-between border-b pb-2">
+                                        <span>Temp Weight (\(\beta_2\))</span>
+                                        <span class="font-bold text-blue-600">+3.294926</span>
+                                    </li>
+                                    <li class="flex justify-between border-b pb-2">
+                                        <span>Rain Weight (\(\beta_3\))</span>
+                                        <span class="font-bold text-blue-600">+0.106848</span>
+                                    </li>
+                                    <li class="flex justify-between pb-2">
+                                        <span>Solar Weight (\(\beta_4\))</span>
+                                        <span class="font-bold text-blue-600">+0.567525</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gradient-to-br from-primary to-green-800 text-white p-6 rounded-xl shadow-lg flex flex-col justify-center items-center text-center">
+                                <i class="fa-solid fa-shield-halved text-4xl md:text-5xl mb-4 text-accent"></i>
+                                <h3 class="text-xl md:text-2xl font-bold mb-2">Model Reliability</h3>
+                                <div class="w-full bg-green-900/50 rounded-full h-4 mb-2">
+                                    <div class="bg-accent h-4 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <div class="flex justify-between w-full text-sm px-2">
+                                    <span>Accuracy</span>
+                                    <span class="font-bold text-accent">~85%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Manual Prediction & 15 Crops -->
+            <section id="section-predict" class="hidden animate-fade-in">
+                <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
+                        <i class="fa-solid fa-sliders mr-2"></i>ระบบทำนายผล (Prediction)
+                    </h2>
+                    
+                    <div class="grid lg:grid-cols-12 gap-8">
+                        <!-- Input Form (Left Side on Desktop) -->
+                        <div class="lg:col-span-4 space-y-6">
+                            <div class="bg-white/80 p-6 rounded-2xl shadow-sm border border-white sticky top-24">
+                                <h3 class="font-bold text-gray-800 mb-4 text-lg">1. กรอกข้อมูลสภาพดิน</h3>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">pH (กรด-ด่าง)</label>
+                                        <div class="relative">
+                                            <i class="fa-solid fa-flask absolute left-3 top-3 text-gray-400"></i>
+                                            <input type="number" id="input-ph" step="0.1" placeholder="e.g. 6.5" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">อุณหภูมิ (°C)</label>
+                                        <div class="relative">
+                                            <i class="fa-solid fa-temperature-half absolute left-3 top-3 text-gray-400"></i>
+                                            <input type="number" id="input-temp" step="0.1" placeholder="e.g. 28.5" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">ปริมาณน้ำฝน (mm)</label>
+                                        <div class="relative">
+                                            <i class="fa-solid fa-cloud-rain absolute left-3 top-3 text-gray-400"></i>
+                                            <input type="number" id="input-rain" step="0.1" placeholder="e.g. 150" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">ความเข้มแสง (MJ/m²)</label>
+                                        <div class="relative">
+                                            <i class="fa-solid fa-sun absolute left-3 top-3 text-gray-400"></i>
+                                            <input type="number" id="input-solar" step="0.1" placeholder="e.g. 18.5" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
+                                        </div>
+                                    </div>
+
+                                    <button onclick="calculatePrediction()" class="w-full bg-primary hover:bg-green-800 text-white font-bold py-3 rounded-xl transition-all shadow-lg transform active:scale-95 mt-4">
+                                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> คำนวณความเหมาะสม
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Area (Right Side on Desktop) -->
+                        <div class="lg:col-span-8 space-y-6">
+                            
+                            <!-- Overall Soil Score -->
+                            <div id="result-card" class="bg-white rounded-3xl p-6 md:p-8 shadow-md text-center border-2 border-dashed border-gray-300 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-gray-200">
+                                    <div id="result-bar" class="h-full bg-primary transition-all duration-1000 w-0"></div>
+                                </div>
+                                
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">2. ผลวิเคราะห์คุณภาพดินรวม (General Soil Fertility)</h3>
+                                
+                                <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
+                                    <div class="text-center">
+                                        <div class="text-sm text-gray-500 mb-1">คะแนนรวม</div>
+                                        <div class="text-4xl md:text-5xl font-bold text-primary font-mono" id="result-score">-</div>
+                                    </div>
+                                    <div class="h-12 w-px bg-gray-200 hidden md:block"></div>
+                                    <div class="text-center">
+                                        <div class="text-sm text-gray-500 mb-1">ระดับความเหมาะสม</div>
+                                        <div class="text-xl md:text-2xl font-bold text-gray-700" id="result-class">-</div>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 mt-4 text-sm bg-gray-50 p-3 rounded-lg inline-block" id="result-advice">รอการคำนวณ...</p>
+                            </div>
+
+                            <!-- 15 Crops List -->
+                            <div id="crops-container" class="hidden animate-fade-in">
+                                <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center">
+                                    <i class="fa-solid fa-seedling text-green-600 mr-2"></i> 
+                                    3. อันดับพืชที่เหมาะสมที่สุด 15 ชนิด (Crops Ranking)
+                                </h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="crops-list">
+                                    <!-- Crops will be injected here via JS -->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Google Sheet Import -->
+            <section id="section-sheet" class="hidden animate-fade-in">
+                <div class="glass-panel rounded-3xl p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
+                        <i class="fa-brands fa-google-drive mr-2"></i>ทำนายผลจาก Google Sheet
+                    </h2>
+
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <!-- Instructions -->
+                        <div class="bg-white/80 p-6 rounded-2xl shadow-sm">
+                            <h3 class="font-bold text-gray-800 mb-4 text-lg">วิธีการใช้งาน</h3>
+                            <ol class="list-decimal list-inside space-y-3 text-sm text-gray-700">
+                                <li>สร้าง Google Sheet มีหัวตาราง: <code>ph</code>, <code>temp</code>, <code>rain</code>, <code>solar</code></li>
+                                <li>ไปที่ <b>File > Share > Publish to web</b></li>
+                                <li>เลือกรูปแบบ <b>Comma-separated values (.csv)</b></li>
+                                <li>นำลิงก์มาวางในช่องด้านล่าง</li>
+                            </ol>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="flex flex-col justify-center">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Google Sheet CSV Link</label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="sheet-url" placeholder="https://docs.google.com/.../pub?output=csv" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
+                                <button onclick="processSheet()" class="bg-primary hover:bg-green-800 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md mt-2 sm:mt-0">
+                                    <i class="fa-solid fa-download"></i> อ่านค่า
+                                </button>
+                            </div>
+                            <button onclick="loadDemoData()" class="text-primary text-sm mt-3 hover:underline text-left">
+                                <i class="fa-solid fa-vial"></i> ลองใช้ข้อมูลตัวอย่าง (Demo Data)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Output -->
+                    <div id="sheet-result-container" class="hidden">
+                        <div class="overflow-x-auto rounded-xl shadow-lg border border-gray-200">
+                            <table class="w-full text-left bg-white border-collapse min-w-[600px]">
+                                <thead class="bg-gray-100 text-gray-700">
+                                    <tr>
+                                        <th class="p-4 font-bold border-b">#</th>
+                                        <th class="p-4 font-bold border-b">pH</th>
+                                        <th class="p-4 font-bold border-b">Temp</th>
+                                        <th class="p-4 font-bold border-b">Rain</th>
+                                        <th class="p-4 font-bold border-b">Solar</th>
+                                        <th class="p-4 font-bold border-b text-center bg-green-50">Avg Score</th>
+                                        <th class="p-4 font-bold border-b text-center bg-green-50">Top Crop</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sheet-table-body" class="text-sm text-gray-600">
+                                    <!-- Rows injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center text-white/80 text-sm mt-12 pb-8 font-display">
+            <p>&copy; 2025 My Soil Mate Project. โรงเรียนห้องสอนศึกษา ในพระอุปถัมภ์ฯ</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // ==========================================
+        // DATA & CONSTANTS
+        // ==========================================
+        
+        // Base Model for General Soil Fertility (Linear Regression)
+        const MODEL = {
+            intercept: -53.527421,
+            coef: { ph: 3.021859, temp: 3.294926, rain: 0.106848, solar: 0.567525 }
+        };
+
+        // 15 Economic Crops Database with Precise Rules
+        const CROP_RULES_15 = {
+            "ข้าว": {ph: [5.0, 7.5], temp: [20, 35], rain: [100, 300], solar: [3.5, 6.0], weights: {ph: 25, temp: 25, rain: 30, solar: 20}, icon: "fa-bowl-rice"},
+            "ข้าวโพด": {ph: [5.5, 7.5], temp: [18, 32], rain: [50, 200], solar: [4.5, 7.0], weights: {ph: 25, temp: 30, rain: 25, solar: 20}, icon: "fa-seedling"},
+            "มันสำปะหลัง": {ph: [5.5, 7.0], temp: [25, 35], rain: [50, 150], solar: [4.5, 7.0], weights: {ph: 25, temp: 25, rain: 20, solar: 30}, icon: "fa-carrot"},
+            "อ้อย": {ph: [5.5, 7.5], temp: [20, 35], rain: [75, 250], solar: [4.5, 7.0], weights: {ph: 20, temp: 25, rain: 25, solar: 30}, icon: "fa-candy-cane"},
+            "ยางพารา": {ph: [4.5, 6.5], temp: [22, 30], rain: [150, 300], solar: [3.5, 6.0], weights: {ph: 25, temp: 25, rain: 30, solar: 20}, icon: "fa-tree"},
+            "ปาล์มน้ำมัน": {ph: [4.0, 6.5], temp: [24, 32], rain: [150, 300], solar: [4.5, 7.0], weights: {ph: 20, temp: 25, rain: 30, solar: 25}, icon: "fa-oil-can"},
+            "ทุเรียน": {ph: [5.5, 6.5], temp: [24, 30], rain: [100, 200], solar: [3.5, 6.0], weights: {ph: 30, temp: 30, rain: 25, solar: 15}, icon: "fa-certificate"},
+            "มังคุด": {ph: [5.5, 6.5], temp: [22, 30], rain: [150, 300], solar: [3.0, 5.5], weights: {ph: 30, temp: 25, rain: 30, solar: 15}, icon: "fa-circle-dot"},
+            "ลำไย": {ph: [5.5, 6.5], temp: [20, 30], rain: [50, 150], solar: [4.5, 7.0], weights: {ph: 25, temp: 25, rain: 20, solar: 30}, icon: "fa-circle"},
+            "ลิ้นจี่": {ph: [5.5, 6.5], temp: [18, 28], rain: [100, 200], solar: [3.5, 6.0], weights: {ph: 25, temp: 30, rain: 25, solar: 20}, icon: "fa-heart"},
+            "มะม่วง": {ph: [5.5, 7.5], temp: [24, 35], rain: [50, 150], solar: [4.5, 7.0], weights: {ph: 20, temp: 25, rain: 20, solar: 35}, icon: "fa-lemon"},
+            "กล้วย": {ph: [5.5, 7.0], temp: [25, 35], rain: [100, 250], solar: [3.5, 6.0], weights: {ph: 25, temp: 25, rain: 30, solar: 20}, icon: "fa-moon"},
+            "สับปะรด": {ph: [4.5, 6.5], temp: [22, 32], rain: [50, 150], solar: [4.5, 7.0], weights: {ph: 25, temp: 25, rain: 20, solar: 30}, icon: "fa-sun"},
+            "กาแฟอาราบิก้า": {ph: [5.5, 6.5], temp: [15, 24], rain: [100, 200], solar: [2.5, 5.0], weights: {ph: 25, temp: 35, rain: 20, solar: 20}, icon: "fa-mug-hot"},
+            "พริก": {ph: [5.5, 6.8], temp: [20, 32], rain: [50, 150], solar: [4.5, 7.0], weights: {ph: 25, temp: 25, rain: 20, solar: 30}, icon: "fa-pepper-hot"}
+        };
+
+        // ==========================================
+        // UI LOGIC
+        // ==========================================
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
+        }
+
+        function showSection(sectionId) {
+            ['report', 'model', 'predict', 'sheet'].forEach(id => {
+                document.getElementById(`section-${id}`).classList.add('hidden');
+                // Handle both desktop and mobile buttons
+                const btn = document.getElementById(`btn-${id}`);
+                const mobileBtn = document.getElementById(`btn-mobile-${id}`);
+                if (btn) btn.classList.remove('active');
+                if (mobileBtn) mobileBtn.classList.remove('active');
+            });
+            
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            
+            const activeBtn = document.getElementById(`btn-${sectionId}`);
+            const activeMobileBtn = document.getElementById(`btn-mobile-${sectionId}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            if (activeMobileBtn) activeMobileBtn.classList.add('active');
+        }
+
+        // ==========================================
+        // NEW SCORING LOGIC
+        // ==========================================
+        
+        // Calculate weighted score for a single factor
+        function scoreFactorWeighted(val, low, high, weight) {
+            if (val === null || isNaN(val)) return { earned: 0.0, reason: "ไม่มีข้อมูล" };
+            
+            // If inside range, full weight
+            if (val >= low && val <= high) return { earned: parseFloat(weight), reason: null };
+
+            // Calculate penalty based on distance from range
+            let diff = Math.min(Math.abs(val - low), Math.abs(val - high));
+            let range = high - low;
+            let diffRatio = range === 0 ? 1 : diff / range; // Avoid divide by zero
+            
+            // Cap ratio at 1 (100% penalty)
+            if(diffRatio > 1) diffRatio = 1;
+
+            let earned = Math.max(weight * (1 - diffRatio), 0);
+            let reason = val < low ? "ต่ำเกินไป" : "สูงเกินไป";
+            
+            return { earned: earned, reason: reason };
+        }
+
+        // Calculate total score for a crop
+        function calculateCropScore(cropName, env) {
+            const rule = CROP_RULES_15[cropName];
+            let total = 0.0;
+            let reasons = [];
+
+            ['ph', 'temp', 'rain', 'solar'].forEach(k => {
+                let res = scoreFactorWeighted(env[k], rule[k][0], rule[k][1], rule.weights[k]);
+                total += res.earned;
+                if (res.reason) {
+                    reasons.push(`${k} ${res.reason}`);
+                }
+            });
+
+            return { 
+                name: cropName,
+                score: parseFloat(total.toFixed(1)), 
+                reasons: reasons,
+                icon: rule.icon
+            };
+        }
+
+        // General soil fertility score using linear regression (original logic)
+        function calculateGeneralScore(ph, temp, rain, solar) {
+            let score = MODEL.intercept + (MODEL.coef.ph * ph) + (MODEL.coef.temp * temp) + 
+                        (MODEL.coef.rain * rain) + (MODEL.coef.solar * solar);
+            return Math.max(0, Math.min(100, score));
+        }
+
+        function calculatePrediction() {
+            const ph = parseFloat(document.getElementById('input-ph').value);
+            const temp = parseFloat(document.getElementById('input-temp').value);
+            const rain = parseFloat(document.getElementById('input-rain').value);
+            const solar = parseFloat(document.getElementById('input-solar').value);
+
+            if (isNaN(ph) || isNaN(temp) || isNaN(rain) || isNaN(solar)) {
+                alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+                return;
+            }
+
+            const env = { ph, temp, rain, solar };
+
+            // 1. General Score
+            const generalScore = calculateGeneralScore(ph, temp, rain, solar);
+            
+            document.getElementById('result-score').innerText = generalScore.toFixed(2);
+            document.getElementById('result-class').innerText = getSuitabilityText(generalScore).text.split(' ')[0];
+            document.getElementById('result-advice').innerText = getSuitabilityText(generalScore).advice;
+            document.getElementById('result-bar').style.width = `${generalScore}%`;
+            document.getElementById('result-card').classList.remove('border-dashed', 'border-gray-300');
+            document.getElementById('result-card').classList.add('border-solid', 'border-primary');
+
+            // 2. Specific Crop Ranking (New Logic)
+            const cropsRanked = Object.keys(CROP_RULES_15).map(name => calculateCropScore(name, env));
+            cropsRanked.sort((a, b) => b.score - a.score);
+
+            // Render List
+            const listContainer = document.getElementById('crops-list');
+            listContainer.innerHTML = '';
+            
+            cropsRanked.forEach((crop, index) => {
+                const colorClass = crop.score >= 80 ? 'text-green-600 bg-green-50 border-green-200' : 
+                                   crop.score >= 60 ? 'text-blue-600 bg-blue-50 border-blue-200' : 
+                                   crop.score >= 40 ? 'text-yellow-600 bg-yellow-50 border-yellow-200' : 'text-red-600 bg-red-50 border-red-200';
+                
+                const reasonHtml = crop.reasons.length > 0 
+                    ? `<div class="mt-2 text-xs text-red-500 bg-white/50 p-1 rounded"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${crop.reasons.slice(0, 2).join(', ')}${crop.reasons.length > 2 ? '...' : ''}</div>` 
+                    : '<div class="mt-2 text-xs text-green-600"><i class="fa-solid fa-check mr-1"></i>เหมาะสม</div>';
+
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border flex flex-col justify-between transition hover:shadow-md bg-white ${colorClass}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center font-bold text-sm shadow-sm text-gray-700">
+                                ${index + 1}
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-800 text-base">${crop.name}</div>
+                                <div class="text-xs text-gray-600"><i class="fa-solid ${crop.icon}"></i></div>
+                            </div>
+                        </div>
+                        <div class="font-bold text-2xl text-gray-800">
+                            ${crop.score.toFixed(0)}%
+                        </div>
+                    </div>
+                    ${reasonHtml}
+                `;
+                listContainer.appendChild(card);
+            });
+
+            document.getElementById('crops-container').classList.remove('hidden');
+        }
+
+        function getSuitabilityText(score) {
+            if (score >= 80) return { text: 'เหมาะสมมาก', advice: 'สภาพดินโดยรวมดีมาก เอื้อต่อการเติบโต' };
+            if (score >= 60) return { text: 'เหมาะสม', advice: 'สภาพดินโดยรวมอยู่ในเกณฑ์ดี' };
+            if (score >= 40) return { text: 'ปานกลาง', advice: 'สภาพดินปานกลาง ควรปรับปรุงบางปัจจัย' };
+            return { text: 'ไม่เหมาะสม', advice: 'สภาพดินค่อนข้างแย่ ควรแก้ไขก่อนปลูก' };
+        }
+
+        // ==========================================
+        // SHEET LOGIC
+        // ==========================================
+        function processSheet() {
+            const url = document.getElementById('sheet-url').value;
+            if (!url) return alert("กรุณาใส่ลิงก์ CSV");
+
+            fetch(url).then(res => res.text()).then(csv => {
+                const rows = csv.split('\n');
+                const tbody = document.getElementById('sheet-table-body');
+                tbody.innerHTML = '';
+                
+                let count = 0;
+                rows.slice(1).forEach((row, i) => {
+                    const cols = row.split(',');
+                    if(cols.length < 4) return;
+                    
+                    const [ph, temp, rain, solar] = cols.map(parseFloat);
+                    if(!isNaN(ph)) {
+                        const env = { ph, temp, rain, solar };
+                        const generalScore = calculateGeneralScore(ph, temp, rain, solar);
+                        
+                        // Find best crop for this row
+                        const cropsRanked = Object.keys(CROP_RULES_15).map(name => calculateCropScore(name, env));
+                        cropsRanked.sort((a, b) => b.score - a.score);
+                        const topCrop = cropsRanked[0];
+                        
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50 border-b">
+                                <td class="p-4">${i+1}</td>
+                                <td class="p-4">${ph}</td>
+                                <td class="p-4">${temp}</td>
+                                <td class="p-4">${rain}</td>
+                                <td class="p-4">${solar}</td>
+                                <td class="p-4 text-center font-bold text-gray-600">${generalScore.toFixed(1)}</td>
+                                <td class="p-4 text-center bg-green-50">
+                                    <div class="font-bold text-primary text-sm">${topCrop.name}</div>
+                                    <div class="text-xs text-gray-500">${topCrop.score.toFixed(1)}%</div>
+                                </td>
+                            </tr>
+                        `;
+                        count++;
+                    }
+                });
+                document.getElementById('sheet-result-container').classList.remove('hidden');
+            }).catch(e => alert("Error: " + e));
+        }
+
+        function loadDemoData() {
+            const demoCSV = `ph,temp,rain,solar\n6.5,28,150,18\n5.0,35,50,22`;
+            const blob = new Blob([demoCSV], { type: 'text/csv' });
+            document.getElementById('sheet-url').value = URL.createObjectURL(blob);
+            processSheet();
+        }
+
+        // Init MathJax
+        window.addEventListener('load', () => { if (window.MathJax) MathJax.typesetPromise(); });
+    </script>
+</body>
+</html>
