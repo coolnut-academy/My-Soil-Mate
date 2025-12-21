@@ -583,11 +583,11 @@
 
                     <div class="grid lg:grid-cols-2 gap-8 mb-8">
                         <div class="space-y-6">
-                            <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm h-full">
+                            <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm h-full flex flex-col">
                                 <h3 class="font-bold text-gray-800 mb-4 text-lg flex items-center">
                                     <i class="fa-solid fa-circle-info text-primary mr-2"></i>ข้อกำหนดไฟล์
                                 </h3>
-                                <ul class="space-y-4 text-sm text-gray-700">
+                                <ul class="space-y-4 text-sm text-gray-700 mb-6">
                                     <li class="flex items-start bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
                                         <div class="bg-green-100 text-primary rounded-full w-6 h-6 flex items-center justify-center shrink-0 mr-3 text-xs mt-0.5">1</div>
                                         <span>ต้องมีหัวตาราง (Header) แถวแรกเขียนว่า: <br><code class="bg-gray-800 text-yellow-400 px-2 py-0.5 rounded text-xs mt-1 block w-max">ph,temp,rain,solar</code></span>
@@ -597,11 +597,31 @@
                                         <span>บันทึกไฟล์เป็นนามสกุล <b>.csv</b> (Comma Delimited) เท่านั้น</span>
                                     </li>
                                 </ul>
+
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+                                    <h4 class="font-bold text-yellow-800 text-sm mb-2 flex items-center">
+                                        <i class="fa-solid fa-lightbulb text-yellow-600 mr-2"></i>คำแนะนำการแปลงข้อมูล (9 → 4)
+                                    </h4>
+                                    <p class="text-xs text-gray-700 mb-2">
+                                        หากคุณมีข้อมูลครบ 9 ตัวแปร (เช่น จาก Sensor/Lab) ให้คัดเลือกเฉพาะ 4 ค่านี้:
+                                    </p>
+                                    <ul class="text-xs text-gray-600 space-y-1 ml-2 list-disc list-inside">
+                                        <li><b>pH</b> (กรด-ด่าง) → ใส่ช่อง <code>ph</code></li>
+                                        <li><b>อุณหภูมิ</b> (Temperature) → ใส่ช่อง <code>temp</code></li>
+                                        <li><b>ปริมาณฝน</b> (Rainfall) → ใส่ช่อง <code>rain</code></li>
+                                        <li><b>แสงแดด</b> (Solar/Light) → ใส่ช่อง <code>solar</code></li>
+                                    </ul>
+                                    <p class="text-[10px] text-red-500 mt-2">
+                                        *ค่าอื่นๆ เช่น N, P, K, ความชื้น ไม่ต้องนำมาใส่ในโมเดลนี้
+                                    </p>
+                                </div>
                                 
-                                <button onclick="downloadTemplate()" class="mt-6 w-full py-3 px-4 bg-white border-2 border-primary text-primary rounded-xl text-sm font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-2 group shadow-sm">
-                                    <i class="fa-solid fa-download group-hover:translate-y-1 transition-transform"></i> 
-                                    ดาวน์โหลดไฟล์ตัวอย่าง (Template)
-                                </button>
+                                <div class="mt-auto">
+                                    <button onclick="downloadTemplate()" class="w-full py-3 px-4 bg-white border-2 border-primary text-primary rounded-xl text-sm font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-2 group shadow-sm">
+                                        <i class="fa-solid fa-download group-hover:translate-y-1 transition-transform"></i> 
+                                        ดาวน์โหลดไฟล์ตัวอย่าง (Template)
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -624,6 +644,13 @@
 
                                 <input id="csv-upload" type="file" class="hidden" accept=".csv" onchange="handleFileUpload(this)" />
                             </label>
+                            
+                            <div class="flex justify-between items-center mt-3 px-1">
+                                <p class="text-xs text-gray-500">รองรับไฟล์ .CSV เท่านั้น</p>
+                                <button onclick="downloadTemplate()" class="text-xs text-primary hover:underline font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-file-arrow-down"></i> โหลดฟอร์มตัวอย่าง
+                                </button>
+                            </div>
                         </div>
                     </div>
 
