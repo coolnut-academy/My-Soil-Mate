@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Soil Mate - ระบบตรวจวัดสภาพดินอัจฉริยะ</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- MathJax for LaTeX -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -91,16 +87,31 @@
             padding: 8px; border-radius: 6px; border: 1px solid #e5e7eb;
             word-break: break-all;
         }
+
+        /* Custom Scrollbar for CSV Table */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 <body class="min-h-screen text-gray-800 font-sans">
 
-    <!-- Overlay to ensure readability -->
     <div class="fixed inset-0 bg-green-900/10 pointer-events-none"></div>
 
     <div class="relative container mx-auto px-4 py-8 max-w-6xl">
         
-        <!-- Header Section -->
         <header class="glass-panel rounded-3xl p-6 md:p-8 mb-6 text-center animate-fade-in border-t-4 border-primary">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="text-left w-full md:w-auto">
@@ -133,9 +144,7 @@
             </div>
         </header>
 
-        <!-- Navigation Bar -->
         <div class="glass-panel rounded-2xl p-2 mb-8 sticky top-4 z-50">
-            <!-- Desktop Nav -->
             <div class="hidden md:flex flex-wrap justify-center gap-4">
                 <button onclick="showSection('report')" id="btn-report" class="nav-btn active px-6 py-3 rounded-xl font-display font-medium transition-all duration-300 hover:bg-green-100 hover:text-primary flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie"></i> รายงานผลวิเคราะห์
@@ -147,11 +156,10 @@
                     <i class="fa-solid fa-calculator"></i> คำนวณความเหมาะสม
                 </button>
                 <button onclick="showSection('sheet')" id="btn-sheet" class="nav-btn px-6 py-3 rounded-xl font-display font-medium transition-all duration-300 hover:bg-green-100 hover:text-primary flex items-center gap-2">
-                    <i class="fa-solid fa-table"></i> Google Sheet
+                    <i class="fa-solid fa-file-csv"></i> ทำนายจาก CSV
                 </button>
             </div>
 
-            <!-- Mobile Nav Header (Hamburger) -->
             <div class="md:hidden flex justify-between items-center px-4 py-2">
                 <span class="font-display font-bold text-primary">เมนูหลัก</span>
                 <button onclick="toggleMobileMenu()" class="text-primary hover:bg-green-100 p-2 rounded-lg transition-colors">
@@ -159,7 +167,6 @@
                 </button>
             </div>
 
-            <!-- Mobile Nav Dropdown -->
             <div id="mobile-menu" class="md:hidden flex flex-col gap-2 px-2 pb-2">
                 <button onclick="showSection('report'); toggleMobileMenu()" id="btn-mobile-report" class="nav-btn active w-full text-left px-4 py-3 rounded-xl font-display font-medium">
                     <i class="fa-solid fa-chart-pie mr-2"></i> รายงานผลวิเคราะห์
@@ -171,18 +178,15 @@
                     <i class="fa-solid fa-calculator mr-2"></i> คำนวณความเหมาะสม
                 </button>
                 <button onclick="showSection('sheet'); toggleMobileMenu()" id="btn-mobile-sheet" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-display font-medium">
-                    <i class="fa-solid fa-table mr-2"></i> Google Sheet
+                    <i class="fa-solid fa-file-csv mr-2"></i> ทำนายจาก CSV
                 </button>
             </div>
         </div>
 
-        <!-- Main Content Area -->
         <main class="min-h-[500px]">
 
-            <!-- Section 1: AI Analysis Report & Dataset -->
             <section id="section-report" class="animate-fade-in">
                 <div class="glass-panel rounded-3xl p-6 md:p-8">
-                    <!-- Part 1: Feature Selection -->
                     <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
                         <i class="fa-solid fa-microchip mr-2"></i>รายงานผลการวิเคราะห์โมเดล
                     </h2>
@@ -240,7 +244,6 @@
                         </div>
                     </div>
 
-                    <!-- Part 2: Dataset Sources (Expanded) -->
                     <div class="border-t pt-8">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                             <div>
@@ -276,7 +279,6 @@
                                 </thead>
                                 <tbody class="text-sm text-gray-600 divide-y divide-gray-100">
                                     
-                                    <!-- Row 1: NASA -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">NASA POWER</div>
@@ -298,7 +300,6 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Row 2: Open-Meteo -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">Open-Meteo (ERA5)</div>
@@ -320,7 +321,6 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Row 3: Open-Elevation -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">Open-Elevation API</div>
@@ -341,7 +341,6 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Row 4: FAO EcoCrop -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">FAO EcoCrop</div>
@@ -361,7 +360,6 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Row 5: FAO AEZ -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">FAO AEZ</div>
@@ -381,7 +379,6 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Row 6: WorldClim -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">WorldClim v2.1</div>
@@ -401,7 +398,6 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Row 7: Sensor -->
                                     <tr class="hover:bg-green-50/50 transition-colors">
                                         <td class="p-4 align-top">
                                             <div class="font-bold text-gray-800">Sensor (สิ่งประดิษฐ์)</div>
@@ -432,7 +428,6 @@
                 </div>
             </section>
 
-            <!-- Section 2: Mathematical Model -->
             <section id="section-model" class="hidden animate-fade-in">
                 <div class="glass-panel rounded-3xl p-6 md:p-8">
                     <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
@@ -490,7 +485,6 @@
                 </div>
             </section>
 
-            <!-- Section 3: Manual Prediction & 15 Crops -->
             <section id="section-predict" class="hidden animate-fade-in">
                 <div class="glass-panel rounded-3xl p-6 md:p-8">
                     <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
@@ -498,7 +492,6 @@
                     </h2>
                     
                     <div class="grid lg:grid-cols-12 gap-8">
-                        <!-- Input Form (Left Side on Desktop) -->
                         <div class="lg:col-span-4 space-y-6">
                             <div class="bg-white/80 p-6 rounded-2xl shadow-sm border border-white sticky top-24">
                                 <h3 class="font-bold text-gray-800 mb-4 text-lg">1. กรอกข้อมูลสภาพดิน</h3>
@@ -543,10 +536,8 @@
                             </div>
                         </div>
 
-                        <!-- Result Area (Right Side on Desktop) -->
                         <div class="lg:col-span-8 space-y-6">
                             
-                            <!-- Overall Soil Score -->
                             <div id="result-card" class="bg-white rounded-3xl p-6 md:p-8 shadow-md text-center border-2 border-dashed border-gray-300 relative overflow-hidden">
                                 <div class="absolute top-0 left-0 w-full h-2 bg-gray-200">
                                     <div id="result-bar" class="h-full bg-primary transition-all duration-1000 w-0"></div>
@@ -568,7 +559,6 @@
                                 <p class="text-gray-600 mt-4 text-sm bg-gray-50 p-3 rounded-lg inline-block" id="result-advice">รอการคำนวณ...</p>
                             </div>
 
-                            <!-- 15 Crops List -->
                             <div id="crops-container" class="hidden animate-fade-in">
                                 <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center">
                                     <i class="fa-solid fa-seedling text-green-600 mr-2"></i> 
@@ -576,8 +566,7 @@
                                 </h3>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="crops-list">
-                                    <!-- Crops will be injected here via JS -->
-                                </div>
+                                    </div>
                             </div>
 
                         </div>
@@ -585,59 +574,88 @@
                 </div>
             </section>
 
-            <!-- Section 4: Google Sheet Import -->
             <section id="section-sheet" class="hidden animate-fade-in">
                 <div class="glass-panel rounded-3xl p-6 md:p-8">
-                    <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4">
-                        <i class="fa-brands fa-google-drive mr-2"></i>ทำนายผลจาก Google Sheet
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-primary mb-6 border-b pb-4 flex items-center gap-3">
+                        <span class="bg-green-100 p-2 rounded-xl"><i class="fa-solid fa-file-csv"></i></span>
+                        ทำนายผลจากไฟล์ CSV
                     </h2>
 
-                    <div class="grid md:grid-cols-2 gap-8 mb-8">
-                        <!-- Instructions -->
-                        <div class="bg-white/80 p-6 rounded-2xl shadow-sm">
-                            <h3 class="font-bold text-gray-800 mb-4 text-lg">วิธีการใช้งาน</h3>
-                            <ol class="list-decimal list-inside space-y-3 text-sm text-gray-700">
-                                <li>สร้าง Google Sheet มีหัวตาราง: <code>ph</code>, <code>temp</code>, <code>rain</code>, <code>solar</code></li>
-                                <li>ไปที่ <b>File > Share > Publish to web</b></li>
-                                <li>เลือกรูปแบบ <b>Comma-separated values (.csv)</b></li>
-                                <li>นำลิงก์มาวางในช่องด้านล่าง</li>
-                            </ol>
-                        </div>
-
-                        <!-- Input Area -->
-                        <div class="flex flex-col justify-center">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Google Sheet CSV Link</label>
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="sheet-url" placeholder="https://docs.google.com/.../pub?output=csv" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary outline-none">
-                                <button onclick="processSheet()" class="bg-primary hover:bg-green-800 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md mt-2 sm:mt-0">
-                                    <i class="fa-solid fa-download"></i> อ่านค่า
+                    <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                        <div class="space-y-6">
+                            <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm h-full">
+                                <h3 class="font-bold text-gray-800 mb-4 text-lg flex items-center">
+                                    <i class="fa-solid fa-circle-info text-primary mr-2"></i>ข้อกำหนดไฟล์
+                                </h3>
+                                <ul class="space-y-4 text-sm text-gray-700">
+                                    <li class="flex items-start bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                        <div class="bg-green-100 text-primary rounded-full w-6 h-6 flex items-center justify-center shrink-0 mr-3 text-xs mt-0.5">1</div>
+                                        <span>ต้องมีหัวตาราง (Header) แถวแรกเขียนว่า: <br><code class="bg-gray-800 text-yellow-400 px-2 py-0.5 rounded text-xs mt-1 block w-max">ph,temp,rain,solar</code></span>
+                                    </li>
+                                    <li class="flex items-start bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                        <div class="bg-green-100 text-primary rounded-full w-6 h-6 flex items-center justify-center shrink-0 mr-3 text-xs mt-0.5">2</div>
+                                        <span>บันทึกไฟล์เป็นนามสกุล <b>.csv</b> (Comma Delimited) เท่านั้น</span>
+                                    </li>
+                                </ul>
+                                
+                                <button onclick="downloadTemplate()" class="mt-6 w-full py-3 px-4 bg-white border-2 border-primary text-primary rounded-xl text-sm font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-2 group shadow-sm">
+                                    <i class="fa-solid fa-download group-hover:translate-y-1 transition-transform"></i> 
+                                    ดาวน์โหลดไฟล์ตัวอย่าง (Template)
                                 </button>
                             </div>
-                            <button onclick="loadDemoData()" class="text-primary text-sm mt-3 hover:underline text-left">
-                                <i class="fa-solid fa-vial"></i> ลองใช้ข้อมูลตัวอย่าง (Demo Data)
-                            </button>
+                        </div>
+
+                        <div class="flex flex-col justify-center">
+                            <label for="csv-upload" class="group flex flex-col items-center justify-center w-full h-full min-h-[250px] border-3 border-dashed border-gray-300 hover:border-primary rounded-3xl cursor-pointer bg-white/50 hover:bg-green-50/50 transition-all relative overflow-hidden">
+                                
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 relative z-10 transition-transform group-hover:scale-105">
+                                    <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center mb-4 group-hover:shadow-lg transition-shadow">
+                                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-primary"></i>
+                                    </div>
+                                    <p class="mb-2 text-lg text-gray-700 font-display font-bold">อัพโหลดไฟล์ CSV</p>
+                                    <p class="text-sm text-gray-500">คลิก หรือ ลากไฟล์มาวางที่นี่</p>
+                                </div>
+                                
+                                <div id="upload-status" class="absolute inset-0 bg-primary/90 flex-col items-center justify-center text-white z-20 hidden">
+                                    <i class="fa-solid fa-check-circle text-5xl mb-3 animate-bounce"></i>
+                                    <p class="font-bold text-lg" id="file-name-display">filename.csv</p>
+                                    <p class="text-sm opacity-80">อ่านข้อมูลเรียบร้อย</p>
+                                </div>
+
+                                <input id="csv-upload" type="file" class="hidden" accept=".csv" onchange="handleFileUpload(this)" />
+                            </label>
                         </div>
                     </div>
 
-                    <!-- Table Output -->
-                    <div id="sheet-result-container" class="hidden">
-                        <div class="overflow-x-auto rounded-xl shadow-lg border border-gray-200">
-                            <table class="w-full text-left bg-white border-collapse min-w-[600px]">
-                                <thead class="bg-gray-100 text-gray-700">
-                                    <tr>
-                                        <th class="p-4 font-bold border-b">#</th>
-                                        <th class="p-4 font-bold border-b">pH</th>
-                                        <th class="p-4 font-bold border-b">Temp</th>
-                                        <th class="p-4 font-bold border-b">Rain</th>
-                                        <th class="p-4 font-bold border-b">Solar</th>
-                                        <th class="p-4 font-bold border-b text-center bg-green-50">Avg Score</th>
-                                        <th class="p-4 font-bold border-b text-center bg-green-50">Top Crop</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sheet-table-body" class="text-sm text-gray-600">
-                                    <!-- Rows injected via JS -->
-                                </tbody>
-                            </table>
+                    <div id="sheet-result-container" class="hidden animate-fade-in">
+                        <div class="flex justify-between items-end mb-4 border-b pb-2">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-xl font-display">
+                                    <i class="fa-solid fa-list-check text-primary mr-2"></i>ผลลัพธ์การคำนวณ
+                                </h3>
+                                <p class="text-xs text-gray-500 mt-1">ระบบวิเคราะห์ข้อมูลทีละแถวและจับคู่พืชให้อัตโนมัติ</p>
+                            </div>
+                            <span id="row-count" class="text-xs font-bold bg-gray-800 text-white px-3 py-1.5 rounded-lg shadow-sm">0 รายการ</span>
+                        </div>
+                        
+                        <div class="overflow-hidden rounded-xl shadow-lg border border-gray-200 bg-white">
+                            <div class="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left border-collapse min-w-[700px]">
+                                    <thead class="bg-gray-50 text-gray-600 text-sm uppercase sticky top-0 z-10 shadow-sm">
+                                        <tr>
+                                            <th class="p-4 font-bold border-b w-16">#</th>
+                                            <th class="p-4 font-bold border-b">pH</th>
+                                            <th class="p-4 font-bold border-b">Temp</th>
+                                            <th class="p-4 font-bold border-b">Rain</th>
+                                            <th class="p-4 font-bold border-b">Solar</th>
+                                            <th class="p-4 font-bold border-b text-center bg-green-50/80 text-primary">Score</th>
+                                            <th class="p-4 font-bold border-b text-center bg-green-50/80 text-primary">Best Crop</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sheet-table-body" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                        </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -650,7 +668,6 @@
         </footer>
     </div>
 
-    <!-- JavaScript Logic -->
     <script>
         // ==========================================
         // DATA & CONSTANTS
@@ -755,7 +772,7 @@
         }
 
         // ==========================================
-        // NEW SCORING LOGIC
+        // SCORING LOGIC
         // ==========================================
         
         // Calculate weighted score for a single factor
@@ -881,58 +898,130 @@
         }
 
         // ==========================================
-        // SHEET LOGIC
+        // NEW CSV UPLOAD LOGIC
         // ==========================================
-        function processSheet() {
-            const url = document.getElementById('sheet-url').value;
-            if (!url) return alert("กรุณาใส่ลิงก์ CSV");
+        
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            const statusDiv = document.getElementById('upload-status');
+            const nameDisplay = document.getElementById('file-name-display');
+            
+            if (!file) return;
 
-            fetch(url).then(res => res.text()).then(csv => {
-                const rows = csv.split('\n');
-                const tbody = document.getElementById('sheet-table-body');
-                tbody.innerHTML = '';
-                
-                let count = 0;
-                rows.slice(1).forEach((row, i) => {
-                    const cols = row.split(',');
-                    if(cols.length < 4) return;
-                    
-                    const [ph, temp, rain, solar] = cols.map(parseFloat);
-                    if(!isNaN(ph)) {
-                        const env = { ph, temp, rain, solar };
-                        const generalScore = calculateGeneralScore(ph, temp, rain, solar);
-                        
-                        // Find best crop for this row
-                        const cropsRanked = Object.keys(CROP_RULES_15).map(name => calculateCropScore(name, env));
-                        cropsRanked.sort((a, b) => b.score - a.score);
-                        const topCrop = cropsRanked[0];
-                        
-                        tbody.innerHTML += `
-                            <tr class="hover:bg-gray-50 border-b">
-                                <td class="p-4">${i+1}</td>
-                                <td class="p-4">${ph}</td>
-                                <td class="p-4">${temp}</td>
-                                <td class="p-4">${rain}</td>
-                                <td class="p-4">${solar}</td>
-                                <td class="p-4 text-center font-bold text-gray-600">${generalScore.toFixed(1)}</td>
-                                <td class="p-4 text-center bg-green-50">
-                                    <div class="font-bold text-primary text-sm">${topCrop.name}</div>
-                                    <div class="text-xs text-gray-500">${topCrop.score.toFixed(1)}%</div>
-                                </td>
-                            </tr>
-                        `;
-                        count++;
-                    }
-                });
-                document.getElementById('sheet-result-container').classList.remove('hidden');
-            }).catch(e => alert("Error: " + e));
+            // Show Success State on Upload Box
+            nameDisplay.innerText = file.name;
+            statusDiv.classList.remove('hidden');
+            statusDiv.classList.add('flex');
+
+            // Read File
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Simulate small delay for UI effect
+                setTimeout(() => {
+                    processCSVData(e.target.result);
+                    // Reset upload box view after 2 seconds (optional)
+                    setTimeout(() => {
+                        statusDiv.classList.add('hidden');
+                        statusDiv.classList.remove('flex');
+                        input.value = ''; // Reset input
+                    }, 1500);
+                }, 500);
+            };
+            
+            reader.onerror = function() {
+                alert("ไม่สามารถอ่านไฟล์ได้");
+                statusDiv.classList.add('hidden');
+            };
+
+            reader.readAsText(file);
         }
 
-        function loadDemoData() {
-            const demoCSV = `ph,temp,rain,solar\n6.5,28,150,18\n5.0,35,50,22`;
-            const blob = new Blob([demoCSV], { type: 'text/csv' });
-            document.getElementById('sheet-url').value = URL.createObjectURL(blob);
-            processSheet();
+        function processCSVData(csvText) {
+            const rows = csvText.trim().split(/\r?\n/); // Handle both \r\n and \n
+            const tbody = document.getElementById('sheet-table-body');
+            tbody.innerHTML = '';
+            
+            let count = 0;
+            
+            // Loop through rows (Skip header index 0)
+            rows.slice(1).forEach((row, i) => {
+                const cols = row.split(',');
+                
+                // Basic Validation
+                if(cols.length < 4) return;
+                
+                const ph = parseFloat(cols[0]);
+                const temp = parseFloat(cols[1]);
+                const rain = parseFloat(cols[2]);
+                const solar = parseFloat(cols[3]);
+
+                if(!isNaN(ph) && !isNaN(temp) && !isNaN(rain) && !isNaN(solar)) {
+                    const env = { ph, temp, rain, solar };
+                    
+                    // 1. Calculate General Score
+                    const generalScore = calculateGeneralScore(ph, temp, rain, solar);
+                    
+                    // 2. Find Best Crop
+                    const cropsRanked = Object.keys(CROP_RULES_15).map(name => calculateCropScore(name, env));
+                    cropsRanked.sort((a, b) => b.score - a.score);
+                    const topCrop = cropsRanked[0];
+                    
+                    // Styling
+                    const scoreColor = generalScore >= 80 ? 'text-green-600' : 
+                                       generalScore >= 60 ? 'text-blue-600' : 
+                                       generalScore >= 40 ? 'text-yellow-600' : 'text-red-500';
+                    
+                    const bgRow = count % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
+
+                    tbody.innerHTML += `
+                        <tr class="${bgRow} hover:bg-green-50 transition-colors group">
+                            <td class="p-4 font-mono text-xs text-gray-400 group-hover:text-primary">${count + 1}</td>
+                            <td class="p-4">${ph}</td>
+                            <td class="p-4">${temp}</td>
+                            <td class="p-4">${rain}</td>
+                            <td class="p-4">${solar}</td>
+                            <td class="p-4 text-center">
+                                <span class="font-bold ${scoreColor} text-base">${generalScore.toFixed(1)}</span>
+                            </td>
+                            <td class="p-4 text-center">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm group-hover:border-primary group-hover:shadow-md transition-all">
+                                    <i class="fa-solid ${topCrop.icon} text-primary"></i>
+                                    <span class="font-bold text-gray-700 text-sm">${topCrop.name}</span>
+                                    <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 rounded-md ml-1">${topCrop.score.toFixed(0)}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    count++;
+                }
+            });
+
+            document.getElementById('row-count').innerText = `${count} รายการ`;
+            
+            // Show Result Section
+            const resultContainer = document.getElementById('sheet-result-container');
+            resultContainer.classList.remove('hidden');
+            
+            // Scroll to result nicely
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            if(count === 0) {
+                alert("ไม่พบข้อมูลที่ถูกต้องในไฟล์ CSV กรุณาตรวจสอบ Format ให้ตรงกับตัวอย่าง");
+            }
+        }
+
+        function downloadTemplate() {
+            // CSV Content with BOM for Excel compatibility in some regions
+            const csvContent = "\uFEFFph,temp,rain,solar\n6.5,28.5,150,18.5\n5.5,32.0,120,20.0\n7.2,25.5,200,16.5";
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "soil_data_template.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // Init MathJax
